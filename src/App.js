@@ -4,9 +4,15 @@ import "./App.css";
 function App() {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
+  const [show, setShow] = useState(false);
+  const [searchArray, setSearchArray] = useState([]);
   const [searchedUsers, setSearchedUsers] = useState(null);
   const [sortedUsers, setSortedUsers] = useState(null);
   const handleSearch = () => {
+    if (search !== "") {
+      setSearchArray((prev) => [...prev, search]);
+      localStorage.setItem("searchArray", JSON.stringify(searchArray));
+    }
     const results = users.filter((user) => {
       return user.name.toLowerCase().includes(search.toLowerCase());
     });
@@ -28,6 +34,11 @@ function App() {
       return 0;
     });
     setSortedUsers(results);
+  };
+  const pastTerms = () => {
+    const storedArray = JSON.parse(localStorage.getItem("searchArray")) || [];
+    setSearchArray(storedArray);
+    setShow(!show);
   };
 
   useEffect(() => {
@@ -57,7 +68,19 @@ function App() {
           />
           <button onClick={handleSearch}>Search</button>
           <button onClick={sortByName}>Sort by name</button>
+          <button onClick={pastTerms}>
+            {!show ? `View past search terms` : `close search terms`}
+          </button>
         </div>
+        {show && (
+          <div>
+            <ul>
+              {searchArray.map((value) => (
+                <li>{value}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <hr />
         <table>
           <thead>
